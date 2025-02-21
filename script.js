@@ -6,7 +6,22 @@ const themeToggle = document.querySelector('.theme-toggle');
 const themeIcons = ["✹", "✸", "✶"];
 const themes = ["theme-light", "theme-dark", "theme-black"];
 
-// Markdown configuration
+// Theme management
+let currentTheme = parseInt(localStorage.getItem('theme') || '0');
+
+function applyTheme() {
+    document.body.className = themes[currentTheme];
+    themeToggle.textContent = themeIcons[currentTheme];
+    
+    // Force re-highlight all code blocks
+    document.querySelectorAll('pre code').forEach((block) => {
+        const language = block.className.match(/language-(\w+)/)?.[1] || 'plaintext';
+        const code = block.textContent;
+        block.innerHTML = Prism.highlight(code, Prism.languages[language], language);
+    });
+}
+
+// Update the marked options to ensure proper code highlighting
 marked.setOptions({
     highlight: (code, lang) => {
         if (Prism.languages[lang]) {
@@ -16,15 +31,9 @@ marked.setOptions({
     },
     breaks: true,
     gfm: true,
+    langPrefix: 'language-'
 });
 
-// Theme management
-let currentTheme = parseInt(localStorage.getItem('theme') || '0');
-
-function applyTheme() {
-    document.body.className = themes[currentTheme];
-    themeToggle.textContent = themeIcons[currentTheme];
-}
 
 function toggleTheme() {
     currentTheme = (currentTheme + 1) % themes.length;
