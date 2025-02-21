@@ -19,7 +19,7 @@ Markdown features.
 
 ## Basic Text Formatting
 
-This is a regular paragraph demonstrating **bold**, _italic_ and \`inline code\`.  
+This is a regular paragraph demonstrating **bold**, _italic_ and \`inline code\`.
 You can also combine **bold** with *italic* if needed.
 
 ## Headings
@@ -53,7 +53,7 @@ Below are examples of headings from level 1 to 6:
 
 ## Blockquotes
 
-> This is a blockquote example.  
+> This is a blockquote example.
 > It can span multiple lines and include **bold text** or other *styling*.
 
 ## Code Blocks
@@ -84,19 +84,20 @@ const saveFile = () => {
 };
 
 const generatePDF = async () => {
-  // Create a temporary container off-screen with fixed desktop width
+  // Create an off-screen container (do NOT use opacity: 0)
   const container = document.createElement('div');
   container.style.position = 'absolute';
-  container.style.top = '-10000px';
-  container.style.left = '0';
+  container.style.left = '-10000px';
+  container.style.top = '0';
   container.style.width = '1100px';
   container.style.height = 'auto';
-  container.style.opacity = '0';
+  container.style.display = 'block';
+  // Clone the preview (with all its content and styling)
+  const clone = preview.cloneNode(true);
+  container.appendChild(clone);
   document.body.appendChild(container);
   
-  // Copy preview content (with its inner HTML)
-  container.innerHTML = preview.innerHTML;
-  // Allow for layout recalculation
+  // Force reflow and allow layout to settle
   await new Promise(resolve => setTimeout(resolve, 100));
   
   try {
