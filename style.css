@@ -25,12 +25,11 @@ body {
   margin: 0;
   padding: 20px;
   font-family: system-ui, sans-serif;
-  min-height: 100vh;
   background: var(--bg);
   color: var(--fg)
 }
 
-.container { max-width: 95%; margin: auto }
+.container { max-width: 1200px; margin: auto }
 
 .controls {
   display: flex;
@@ -44,20 +43,19 @@ body {
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--bg);
-  color: var(--fg);
-  transition: .2s
+  color: var(--fg)
 }
 
-.controls > button:hover { transform: translateY(-2px) }
-.controls > button:active { transform: translateY(0) }
-.controls > input { width: 200px }
+.controls button { cursor: pointer }
+.controls button:hover { opacity: 0.9 }
+.controls button:active { transform: translateY(1px) }
+.controls input { width: 200px }
 
 .version {
-  border: none !important;
-  padding: 0 !important;
+  border: none;
+  padding: 0;
   margin-left: auto;
-  opacity: 0.7;
-  font-size: 0.9em
+  opacity: 0.7
 }
 
 .editor {
@@ -76,26 +74,36 @@ body {
 
 #markdown {
   resize: none;
-  font: 1em monospace;
+  font: 14px monospace;
   background: var(--editor-bg);
   color: var(--fg)
 }
 
-#preview {
-  background: var(--bg);
-  line-height: 1.6
-}
-
+#preview { background: var(--bg) }
 #preview img { max-width: 100% }
 #preview pre { overflow-x: auto }
+#preview code { background: var(--editor-bg); padding: 2px 4px; border-radius: 3px }
 
 @media (max-width: 768px) {
   .editor {
       grid-template-columns: 1fr;
       height: auto
   }
-  
   #markdown, #preview { height: 50vh }
-  
   .version { display: none }
+}
+
+/* Syntax highlighting */
+.token.comment { color: #6a737d }
+.token.keyword { color: #d73a49 }
+.token.string { color: #032f62 }
+.token.function { color: #6f42c1 }
+.token.number { color: #005cc5 }
+
+@media (prefers-color-scheme: dark) {
+  .token.comment { color: #768390 }
+  .token.keyword { color: #ff7b72 }
+  .token.string { color: #a5d6ff }
+  .token.function { color: #d2a8ff }
+  .token.number { color: #79c0ff }
 }

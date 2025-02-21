@@ -6,48 +6,12 @@ const themeBtn = $('themeBtn')
 const saveBtn = $('saveBtn')
 const printBtn = $('printBtn')
 
-const themeIcons = ['✹', '✸', '✶']
-let theme = parseInt(localStorage.getItem('theme') || 
-    (window.matchMedia('(prefers-color-scheme: dark)').matches ? '1' : '0'))
-
 marked.setOptions({
-    highlight: (code, lang) => 
-        Prism.languages[lang] ? Prism.highlight(code, Prism.languages[lang], lang) : code,
     breaks: true,
     gfm: true
 })
 
-const updatePreview = () => {
-    preview.innerHTML = marked.parse(markdown.value)
-    Prism.highlightAll()
-}
-
-const saveFile = () => {
-    const blob = new Blob([markdown.value], { type: 'text/markdown' })
-    const url = URL.createObjectURL(blob)
-    Object.assign(document.createElement('a'), {
-        href: url,
-        download: filename.value
-    }).click()
-    URL.revokeObjectURL(url)
-}
-
-const generatePDF = () => html2pdf().set({
-    margin: [0.75, 0.75, 0.75, 0.75],
-    filename: filename.value.replace('.md', '.pdf'),
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, letterRendering: true },
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-}).from(preview.cloneNode(true)).save()
-
-const toggleTheme = () => {
-    theme = (theme + 1) % 3
-    document.body.className = theme === 2 ? 'theme-black' : ''
-    localStorage.setItem('theme', theme)
-    themeBtn.textContent = themeIcons[theme]
-}
-
-markdown.value = `# Example Markdown Document
+const initialContent = `# Example Markdown Document
 
 Welcome to the **Custom Markdown Editor**. This editor supports _all_ of the standard GitHub-flavored
 Markdown features.
@@ -105,10 +69,45 @@ function fibonacci(n) {
 console.log(fibonacci(10))
 \`\`\``
 
+const updatePreview = () => {
+    preview.innerHTML = marked.parse(markdown.value)
+    Prism?.highlightAll()
+}
+
+const saveFile = () => {
+    const blob = new Blob([markdown.value], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    Object.assign(document.createElement('a'), {
+        href: url,
+        download: filename.value
+    }).click()
+    URL.revokeObjectURL(url)
+}
+
+const generatePDF = () => html2pdf().set({
+    margin: 0.5,
+    filename: filename.value.replace('.md', '.pdf'),
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+}).from(preview).save()
+
+const themeIcons = ['✹', '✸', '✶']
+let theme = parseInt(localStorage.getItem('theme') || 
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? '1' : '0'))
+
+const toggleTheme = () => {
+    theme = (theme + 1) % 3
+    document.body.className = theme === 2 ? 'theme-black' : ''
+    localStorage.setItem('theme', theme)
+    themeBtn.textContent = themeIcons[theme]
+}
+
 saveBtn.onclick = saveFile
 printBtn.onclick = generatePDF
 themeBtn.onclick = toggleTheme
-markdown.addEventListener('input', updatePreview)
+markdown.oninput = updatePreview
 
+markdown.value = initialContent
 toggleTheme()
 updatePreview()
