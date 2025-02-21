@@ -84,24 +84,99 @@ const saveFile = () => {
     URL.revokeObjectURL(url)
 }
 
-const generatePDF = () => html2pdf().set({
-    margin: 0.5,
-    filename: filename.value.replace('.md', '.pdf'),
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-}).from(preview).save()
+const generatePDF = () => {
+    const isMobile = window.innerWidth <= 768
+    const element = preview.cloneNode(true)
+    
+    if (isMobile) {
+        // Apply desktop-like styling for PDF generation
+        Object.assign(element.style, {
+            width: '1100px',
+            padding: '20px',
+            backgroundColor: 'var(--bg)',
+            color: 'var(--fg)'
+        })
+        
+        // Force proper code block rendering
+        element.querySelectorAll('pre').forEach(pre => {
+            Object.assign(pre.style, {
+                backgroundColor: 'var(--code-bg)',
+                border: '1px solid var(--code-border)',
+                padding: '16px',
+                borderRadius: '6px',
+                overflow: 'auto'
+            })
+        })
+        
+        element.querySelectorAll('code').forEach(code => {
+            if (!code.parentElement.matches('pre')) {
+                Object.assign(code.style, {
+                    backgroundColor: 'var(--code-bg)',
+                    padding: '2px 4px',
+                    borderRadius: '3px'
+                })
+            }
+        })
+    }
+
+    const opt = {
+        margin: 0.5,
+        filename: filename.value.replace('.md', '.pdf'),
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { 
+            scale: 2,
+            letterRendering: true,
+            useCORS: true,
+            width: isMobile ? 1100 : undefined,
+            windowWidth: isMobile ? 1100 : undefined
+        },
+        jsPDF: { 
+            unit: 'in', 
+            format: 'letter', 
+            orientation: 'portrait'
+        }
+    }
+
+    // Create temporary container for PDF generation
+    if (isMobile) {
+        const container = document.createElement('div')
+        container.style.position = 'absolute'
+        container.style.left = '-9999px'
+        container.style.width = '1100px'
+        container.appendChild(element)
+        document.body.appendChild(container)
+        
+        html2pdf().set(opt).from(element).save().then(() => {
+            container.remove()
+        })
+    } else {
+        html2pdf().set(opt).from(element).save()
+    }
+}
 
 const themeIcons = ['✹', '✸', '✶']
-let theme = parseInt(localStorage.getItem('theme') || 
-    (window.matchMedia('(prefers-color-scheme: dark)').matches ? '1' : '0'))
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)')
+let theme = parseInt(localStorage.getItem('theme') ?? 
+    (prefersDark.matches ? '1' : '0'))
 
 const toggleTheme = () => {
     theme = (theme + 1) % 3
-    document.body.className = theme === 2 ? 'theme-black' : ''
+    applyTheme()
     localStorage.setItem('theme', theme)
+}
+
+const applyTheme = () => {
+    document.body.className = theme === 2 ? 'theme-black' : 
+        theme === 1 ? 'theme-dark' : ''
     themeBtn.textContent = themeIcons[theme]
 }
+
+prefersDark.addEventListener('change', e => {
+    if (localStorage.getItem('theme') === null) {
+        theme = e.matches ? 1 : 0
+        applyTheme()
+    }
+})
 
 saveBtn.onclick = saveFile
 printBtn.onclick = generatePDF
