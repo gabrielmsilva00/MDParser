@@ -1,53 +1,70 @@
-const editor = document.getElementById("editor")
-const rendered = document.getElementById("rendered")
-const fileNameInput = document.getElementById("fileName")
-const saveFile = document.getElementById("saveFile")
-const printPDF = document.getElementById("printPDF")
+const markdown = document.getElementById("markdown");
+const preview = document.getElementById("preview");
+const filename = document.getElementById("filename");
 
-const colorTitle = document.getElementById("color-title")
-const colorSubtitle = document.getElementById("color-subtitle")
-const colorHeader = document.getElementById("color-header")
-const colorList = document.getElementById("color-list")
-const colorLink = document.getElementById("color-link")
+marked.setOptions({
+  highlight: (code, lang) => {
+    if (Prism.languages[lang]) {
+      return Prism.highlight(code, Prism.languages[lang], lang);
+    }
+    return code;
+  },
+  breaks: true,
+  gfm: true,
+});
 
 const updatePreview = () => {
-  const html = marked.parse(editor.value, { gfm: true, breaks: true })
-  rendered.innerHTML = html
-  document.querySelectorAll("pre code").forEach(block =>
-    hljs.highlightElement(block)
-  )
-}
+  const content = markdown.value;
+  preview.innerHTML = marked.parse(content);
+  Prism.highlightAll();
+};
 
-editor.addEventListener("input", updatePreview)
+markdown.addEventListener("input", updatePreview);
 
-saveFile.addEventListener("click", () => {
-  const blob = new Blob([editor.value], { type: "text/plain" })
-  const a = document.createElement("a")
-  a.href = URL.createObjectURL(blob)
-  a.download = fileNameInput.value.trim() || "untitled.md"
-  a.click()
-})
+const saveFile = () => {
+  const content = markdown.value;
+  const blob = new Blob([content], { type: "text/markdown" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename.value;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 
-printPDF.addEventListener("click", () => window.print())
+const generatePDF = () => {
+  const element = preview.cloneNode(true);
+  const opt = {
+    margin: 1,
+    filename: filename.value.replace(".md", ".pdf"),
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2 },
+    jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+  };
+  html2pdf().set(opt).from(element).save();
+};
 
-// Load example markdown on startup
-fetch("example.md")
-  .then(res => res.text())
-  .then(text => {
-    editor.value = text
-    updatePreview()
-  })
-  .catch(console.error)
+const themes = ["theme-light", "theme-dark", "theme-black"];
+let currentTheme = 0;
 
-// Update custom properties based on palette changes
-[
-  { el: colorTitle, prop: "--title-color" },
-  { el: colorSubtitle, prop: "--subtitle-color" },
-  { el: colorHeader, prop: "--header-color" },
-  { el: colorList, prop: "--list-color" },
-  { el: colorLink, prop: "--link-color" }
-].forEach(({ el, prop }) => {
-  el.addEventListener("change", e =>
-    document.documentElement.style.setProperty(prop, e.target.value)
-  )
-})
+const toggleTheme = () => {
+  currentTheme = (currentTheme + 1) % themes.length;
+  document.body.className = themes[currentTheme];
+};
+
+markdown.value = `# Welcome to Markdown Parser
+
+## Features
+- GitHub Flavored Markdown
+- Syntax highlighting
+- Dark mode toggle
+- PDF export
+- File saving
+
+\`\`\`javascript
+const greeting = "Hello, World!";
+console.log(greeting);
+\`\`\`
+`;
+
+updatePreview();

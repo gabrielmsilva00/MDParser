@@ -1,47 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Custom Markdown Editor</title>
-    <link rel="stylesheet" href="style.css?v=0.0.1" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css"
-    />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Markdown Parser</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  </head>
-  <body>
-    <div class="version">v0.0.1</div>
-    <div class="main-container">
-      <div class="split-view">
-        <div class="left-panel">
-          <div class="toolbar">
-            <label for="fileName">File Name:</label>
-            <input id="fileName" type="text" value="example.md" />
-            <button id="saveFile">Save File</button>
-            <button id="printPDF">Print as PDF</button>
-          </div>
-          <textarea id="editor" spellcheck="false"></textarea>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body class="theme-light">
+    <div class="container">
+        <div class="controls">
+            <input type="text" id="filename" value="example.md">
+            <button onclick="saveFile()">Save</button>
+            <button onclick="generatePDF()">Print PDF</button>
+            <button onclick="toggleTheme()">Toggle Theme</button>
         </div>
-        
-        <div class="right-panel">
-          <div id="colorPalette">
-            <fieldset>
-              <legend>Customize Colors</legend>
-              <div class="color-inputs">
-                <label>Title (#): <input id="color-title" type="color" value="#000000" /></label>
-                <label>Subtitle (##): <input id="color-subtitle" type="color" value="#333333" /></label>
-                <label>Header (###): <input id="color-header" type="color" value="#555555" /></label>
-                <label>Lists: <input id="color-list" type="color" value="#007acc" /></label>
-                <label>Links: <input id="color-link" type="color" value="#0645ad" /></label>
-              </div>
-            </fieldset>
-          </div>
-          <div id="rendered"></div>
+        <div class="editor">
+            <textarea id="markdown"></textarea>
+            <div id="preview"></div>
         </div>
-      </div>
     </div>
-    <script src="script.js?v=0.0.1"></script>
-  </body>
+    <script src="script.js"></script>
+</body>
 </html>
