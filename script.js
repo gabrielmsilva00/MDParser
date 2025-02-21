@@ -1,133 +1,91 @@
-const markdown = document.getElementById("markdown");
-const preview = document.getElementById("preview");
-const filename = document.getElementById("filename");
-
+// Initialize marked with options
 marked.setOptions({
-  highlight: (code, lang) => {
-    if (Prism.languages[lang]) {
-      return Prism.highlight(code, Prism.languages[lang], lang);
-    }
-    return code;
-  },
+  highlight: (code, lang) => Prism.languages[lang] ? 
+      Prism.highlight(code, Prism.languages[lang], lang) : code,
   breaks: true,
-  gfm: true,
+  gfm: true
 });
 
-const updatePreview = () => {
-  const content = markdown.value;
-  preview.innerHTML = marked.parse(content);
-  Prism.highlightAll();
+// DOM Elements
+const elements = {
+  markdown: document.getElementById('markdown'),
+  preview: document.getElementById('preview'),
+  filename: document.getElementById('filename'),
+  themeToggle: document.getElementById('themeToggle'),
+  saveBtn: document.getElementById('saveBtn'),
+  printBtn: document.getElementById('printBtn')
 };
 
-markdown.addEventListener("input", updatePreview);
-
-const saveFile = () => {
-  const content = markdown.value;
-  const blob = new Blob([content], { type: "text/markdown" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename.value;
-  a.click();
-  URL.revokeObjectURL(url);
+// Theme Configuration
+const themeConfig = {
+  icons: ['✹', '✸', '✶'],
+  classes: ['theme-light', 'theme-dark', 'theme-black'],
+  current: parseInt(localStorage.getItem('theme')) || 0
 };
 
-const generatePDF = () => {
-  const element = preview.cloneNode(true);
-  const opt = {
-      margin: [0.75, 0.75, 0.75, 0.75],
-      filename: filename.value.replace(".md", ".pdf"),
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { 
-          scale: 2,
-          letterRendering: true,
-          useCORS: true
-      },
-      jsPDF: { 
-          unit: "in", 
-          format: "letter", 
-          orientation: "portrait"
-      }
+// Event Handlers
+const handlers = {
+  updatePreview: debounce(() => {
+      elements.preview.innerHTML = marked.parse(elements.markdown.value);
+      Prism.highlightAll();
+  }, 150),
+
+  saveFile: () => {
+      const blob = new Blob([elements.markdown.value], { type: 'text/markdown' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = elements.filename.value;
+      a.click();
+      URL.revokeObjectURL(url);
+  },
+
+  generatePDF: async () => {
+      const element = elements.preview.cloneNode(true);
+      const opt = {
+          margin: [0.75, 0.75, 0.75, 0.75],
+          filename: elements.filename.value.replace('.md', '.pdf'),
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, letterRendering: true },
+          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      };
+      await html2pdf().set(opt).from(element).save();
+  },
+
+  toggleTheme: () => {
+      themeConfig.current = (themeConfig.current + 1) % themeConfig.classes.length;
+      localStorage.setItem('theme', themeConfig.current);
+      applyTheme();
+  }
+};
+
+// Utility Functions
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+      const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
   };
-  html2pdf().set(opt).from(element).save();
-};
-
-const themeIcons = ["✹", "✸", "✶"];
-const themes = ["theme-light", "theme-dark", "theme-black"];
-
-// Load theme from localStorage or default to 0
-let currentTheme = parseInt(localStorage.getItem('theme')) || 0;
-
-const toggleTheme = () => {
-    currentTheme = (currentTheme + 1) % themes.length;
-    applyTheme();
-    localStorage.setItem('theme', currentTheme);
-};
-
-const applyTheme = () => {
-    document.body.className = themes[currentTheme];
-    document.querySelector('.theme-toggle').textContent = themeIcons[currentTheme];
-};
-
-// Apply theme on load
-window.addEventListener('DOMContentLoaded', applyTheme);
-
-markdown.value = `# Example Markdown Document
-
-Welcome to the **Custom Markdown Editor**. This editor supports _all_ of the standard GitHub-flavored
-Markdown features.
-
----
-
-## Basic Text Formatting
-
-This is a regular paragraph demonstrating **bold**, _italic_ and \`inline code\`.  
-You can also combine **bold** with *italic* if needed.
-
-## Headings
-
-Below are examples of headings from level 1 to 6:
-
-# Heading Level 1
-## Heading Level 2
-### Heading Level 3
-#### Heading Level 4
-##### Heading Level 5
-###### Heading Level 6
-
-## Lists
-
-### Unordered List
-
-- Item 1
-- Item 2
-  - Nested Item 2a
-  - Nested Item 2b
-- Item 3
-
-### Ordered List
-
-1. First item
-2. Second item
-   1. Subitem one
-   2. Subitem two
-3. Third item
-
-## Blockquotes
-
-> This is a blockquote example.  
-> It can span multiple lines and include **bold text** or other *styling*.
-
-## Code Blocks
-
-Here is a JavaScript example:
-
-\`\`\`js
-function fibonacci(n) {
-  if (n <= 1) return n
-  return fibonacci(n - 1) + fibonacci(n - 2)
 }
-console.log(fibonacci(10))
-\`\`\``;
 
-updatePreview();
+function applyTheme() {
+  document.body.className = themeConfig.classes[themeConfig.current];
+  elements.themeToggle.textContent = themeConfig.icons[themeConfig.current];
+}
+
+// Event Listeners
+elements.markdown.addEventListener('input', handlers.updatePreview);
+elements.saveBtn.addEventListener('click', handlers.saveFile);
+elements.printBtn.addEventListener('click', handlers.generatePDF);
+elements.themeToggle.addEventListener('click', handlers.toggleTheme);
+
+// Initialize
+window.addEventListener('DOMContentLoaded', () => {
+  applyTheme();
+  elements.markdown.value = `/* Your example markdown */`;
+  handlers.updatePreview();
+});

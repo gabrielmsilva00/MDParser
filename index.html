@@ -6,26 +6,27 @@
     <title>Markdown Parser</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
-<body class="theme-light">
+<body>
     <div class="top-bar">
         <span class="version">v0.0.1</span>
-        <button onclick="toggleTheme()" class="theme-toggle">✹</button>
+        <button id="themeToggle" class="theme-toggle">✹</button>
     </div>
     <div class="container">
         <div class="controls">
             <input type="text" id="filename" value="example.md">
-            <button onclick="saveFile()">Save</button>
-            <button onclick="generatePDF()">Print</button>
+            <button id="saveBtn" class="btn-primary">Save</button>
+            <button id="printBtn" class="btn-primary">Print</button>
         </div>
         <div class="editor">
-            <textarea id="markdown"></textarea>
+            <textarea id="markdown" spellcheck="false"></textarea>
             <div id="preview"></div>
         </div>
     </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

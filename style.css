@@ -1,211 +1,82 @@
+/* Add these new styles and modifications */
+
 :root {
-  --bg-color: #ffffff;
-  --text-color: #333333;
-  --border-color: #cccccc;
-  --editor-bg: #f5f5f5;
+  --primary-color: #2196f3;
+  --hover-color: #1976d2;
+  --active-color: #1565c0;
+  --animation-speed: 0.2s;
 }
 
-.theme-light {
-  --bg-color: #ffffff;
-  --text-color: #333333;
-  --border-color: #cccccc;
-  --editor-bg: #f5f5f5;
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+  transition: all var(--animation-speed) ease;
 }
 
-.theme-dark {
-  --bg-color: #2d2d2d;
-  --text-color: #ffffff;
-  --border-color: #555555;
-  --editor-bg: #1e1e1e;
-}
-
-.theme-black {
-  --bg-color: #000000;
-  --text-color: #ffffff;
-  --border-color: #333333;
-  --editor-bg: #111111;
-}
-
-body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  min-height: 100vh;
-}
-
-.top-bar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  padding: 10px 20px;
-  z-index: 1000;
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
-
-.version {
-  font-size: 0.9em;
-  opacity: 0.7;
-}
-
-.theme-toggle {
-  background: none;
-  border: none;
-  color: var(--text-color);
-  font-size: 1.2em;
-  cursor: pointer;
-  padding: 5px;
-  transition: transform 0.3s ease;
-}
-
-.theme-toggle:hover {
-  transform: rotate(180deg);
-}
-
-.container {
-  padding: 40px;
-  max-width: 95%;
-  margin: 0 auto;
-}
-
-.controls {
-  margin-bottom: 20px;
-}
-
-.controls button, .controls input {
-  padding: 8px 16px;
-  margin-right: 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background: var(--bg-color);
-  color: var(--text-color);
-}
-
-.editor {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  height: calc(100vh - 140px);
-}
-
-#markdown {
-  background: var(--editor-bg);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 20px;
-  resize: none;
-  font-family: monospace;
-  font-size: 1em;
-  line-height: 1.5;
-}
-
-#preview {
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 20px;
-  overflow-y: auto;
-  line-height: 1.6;
-}
-
-#preview img {
-  max-width: 100%;
-}
-
-#preview code {
-  background: var(--editor-bg);
-  padding: 2px 5px;
-  border-radius: 3px;
-}
-
-#preview pre {
-  background: var(--editor-bg);
-  padding: 15px;
-  border-radius: 4px;
-  overflow-x: auto;
-}
-
-@media (max-width: 768px) {
-  .container {
-      padding: 20px;
-  }
-  
-  .editor {
-      grid-template-columns: 1fr;
-      height: auto;
-  }
-  
-  #markdown, #preview {
-      height: 50vh;
-  }
-  
-  .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-  }
-  
-  .controls button, .controls input {
-      margin: 0;
-      flex: 1;
-  }
-}
-
-/* Add these to your existing CSS */
-.controls button, .controls input, .theme-toggle {
-  transition: all 0.3s ease;
-}
-
-.controls button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.controls button:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-}
-
-.theme-toggle {
-  opacity: 0.8;
-  padding: 8px;
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s ease, height 0.6s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: var(--hover-color);
+}
+
+.btn-primary:active::after {
+  width: 200px;
+  height: 200px;
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  background: var(--active-color);
+}
+
+.theme-toggle {
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid var(--border-color);
   background: var(--bg-color);
-  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  font-size: 1.4em;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .theme-toggle:hover {
-  opacity: 1;
   transform: rotate(180deg) scale(1.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
 }
 
 .theme-toggle:active {
-  transform: rotate(180deg) scale(0.95);
+  transform: rotate(180deg) scale(0.9);
 }
 
-/* Fix PDF text clipping by adjusting preview styles */
-#preview {
-  line-height: 1.8;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
+/* Keep your existing CSS and update these properties */
+.controls button, .controls input {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 500;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  cursor: pointer;
 }
 
-#preview h1, #preview h2, #preview h3, #preview h4, #preview h5, #preview h6 {
-  margin: 1.5em 0 0.5em 0;
-  line-height: 1.4;
-}
-
-#preview p {
-  margin: 0 0 1em 0;
+.controls input {
+  background: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
 }
