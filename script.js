@@ -1,91 +1,135 @@
-// Initialize marked with options
-marked.setOptions({
-  highlight: (code, lang) => Prism.languages[lang] ? 
-      Prism.highlight(code, Prism.languages[lang], lang) : code,
-  breaks: true,
-  gfm: true
-});
+class MarkdownEditor {
+  constructor() {
+      this.elements = {
+          markdown: document.getElementById('markdown'),
+          preview: document.getElementById('preview'),
+          filename: document.getElementById('filename'),
+          themeToggle: document.getElementById('themeToggle'),
+          saveBtn: document.getElementById('saveBtn'),
+          printBtn: document.getElementById('printBtn')
+      };
 
-// DOM Elements
-const elements = {
-  markdown: document.getElementById('markdown'),
-  preview: document.getElementById('preview'),
-  filename: document.getElementById('filename'),
-  themeToggle: document.getElementById('themeToggle'),
-  saveBtn: document.getElementById('saveBtn'),
-  printBtn: document.getElementById('printBtn')
-};
+      this.config = {
+          themes: ['theme-light', 'theme-dark', 'theme-black'],
+          themeIcons: ['✹', '✸', '✶'],
+          currentTheme: parseInt(localStorage.getItem('theme')) || 0,
+          defaultContent: this.getDefaultContent()
+      };
 
-// Theme Configuration
-const themeConfig = {
-  icons: ['✹', '✸', '✶'],
-  classes: ['theme-light', 'theme-dark', 'theme-black'],
-  current: parseInt(localStorage.getItem('theme')) || 0
-};
+      this.init();
+  }
 
-// Event Handlers
-const handlers = {
-  updatePreview: debounce(() => {
-      elements.preview.innerHTML = marked.parse(elements.markdown.value);
+  init() {
+      this.setupMarked();
+      this.setupEventListeners();
+      this.loadInitialContent();
+      this.applyTheme();
+  }
+
+  setupMarked() {
+      marked.setOptions({
+          highlight: (code, lang) => {
+              if (Prism.languages[lang]) {
+                  return Prism.highlight(code, Prism.languages[lang], lang);
+              }
+              return code;
+          },
+          breaks: true,
+          gfm: true
+      });
+  }
+
+  setupEventListeners() {
+      // Debounced preview update
+      let timeout;
+      this.elements.markdown.addEventListener('input', () => {
+          clearTimeout(timeout);
+          timeout = setTimeout(() => this.updatePreview(), 150);
+      });
+
+      this.elements.saveBtn.addEventListener('click', () => this.saveFile());
+      this.elements.printBtn.addEventListener('click', () => this.generatePDF());
+      this.elements.themeToggle.addEventListener('click', () => this.toggleTheme());
+
+      // Auto-save content to localStorage
+      window.addEventListener('beforeunload', () => {
+          localStorage.setItem('markdown-content', this.elements.markdown.value);
+      });
+  }
+
+  updatePreview() {
+      const content = this.elements.markdown.value;
+      this.elements.preview.innerHTML = marked.parse(content);
       Prism.highlightAll();
-  }, 150),
+  }
 
-  saveFile: () => {
-      const blob = new Blob([elements.markdown.value], { type: 'text/markdown' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = elements.filename.value;
-      a.click();
-      URL.revokeObjectURL(url);
-  },
+  async saveFile() {
+      try {
+          const blob = new Blob([this.elements.markdown.value], { type: 'text/markdown' });
+          const handle = await window.showSaveFilePicker({
+              suggestedName: this.elements.filename.value,
+              types: [{
+                  description: 'Markdown files',
+                  accept: { 'text/markdown': ['.md'] }
+              }]
+          });
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+      } catch (err) {
+          // Fallback for browsers that don't support File System Access API
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = this.elements.filename.value;
+          a.click();
+          URL.revokeObjectURL(url);
+      }
+  }
 
-  generatePDF: async () => {
-      const element = elements.preview.cloneNode(true);
+  async generatePDF() {
+      const element = this.elements.preview.cloneNode(true);
       const opt = {
           margin: [0.75, 0.75, 0.75, 0.75],
-          filename: elements.filename.value.replace('.md', '.pdf'),
+          filename: this.elements.filename.value.replace('.md', '.pdf'),
           image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2, letterRendering: true },
-          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+          html2canvas: { 
+              scale: 2,
+              letterRendering: true,
+              useCORS: true
+          },
+          jsPDF: { 
+              unit: 'in', 
+              format: 'letter', 
+              orientation: 'portrait'
+          }
       };
       await html2pdf().set(opt).from(element).save();
-  },
-
-  toggleTheme: () => {
-      themeConfig.current = (themeConfig.current + 1) % themeConfig.classes.length;
-      localStorage.setItem('theme', themeConfig.current);
-      applyTheme();
   }
-};
 
-// Utility Functions
-function debounce(func, wait) {
-  let timeout;
-  return function executedFunction(...args) {
-      const later = () => {
-          clearTimeout(timeout);
-          func(...args);
-      };
-      clearTimeout(timeout);
-      timeout = setTimeout(later, wait);
-  };
+  toggleTheme() {
+      this.config.currentTheme = (this.config.currentTheme + 1) % this.config.themes.length;
+      this.applyTheme();
+      localStorage.setItem('theme', this.config.currentTheme);
+  }
+
+  applyTheme() {
+      document.body.className = this.config.themes[this.config.currentTheme];
+      this.elements.themeToggle.textContent = this.config.themeIcons[this.config.currentTheme];
+  }
+
+  loadInitialContent() {
+      const savedContent = localStorage.getItem('markdown-content');
+      this.elements.markdown.value = savedContent || this.config.defaultContent;
+      this.updatePreview();
+  }
+
+  getDefaultContent() {
+      return `# Example Markdown Document\n\n...`; // Your existing default content
+  }
 }
 
-function applyTheme() {
-  document.body.className = themeConfig.classes[themeConfig.current];
-  elements.themeToggle.textContent = themeConfig.icons[themeConfig.current];
-}
-
-// Event Listeners
-elements.markdown.addEventListener('input', handlers.updatePreview);
-elements.saveBtn.addEventListener('click', handlers.saveFile);
-elements.printBtn.addEventListener('click', handlers.generatePDF);
-elements.themeToggle.addEventListener('click', handlers.toggleTheme);
-
-// Initialize
-window.addEventListener('DOMContentLoaded', () => {
-  applyTheme();
-  elements.markdown.value = `/* Your example markdown */`;
-  handlers.updatePreview();
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  window.editor = new MarkdownEditor();
 });
