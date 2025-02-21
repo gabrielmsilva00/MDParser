@@ -6,22 +6,7 @@ const themeToggle = document.querySelector('.theme-toggle');
 const themeIcons = ["✹", "✸", "✶"];
 const themes = ["theme-light", "theme-dark", "theme-black"];
 
-// Theme management
-let currentTheme = parseInt(localStorage.getItem('theme') || '0');
-
-function applyTheme() {
-    document.body.className = themes[currentTheme];
-    themeToggle.textContent = themeIcons[currentTheme];
-    
-    // Force re-highlight all code blocks
-    document.querySelectorAll('pre code').forEach((block) => {
-        const language = block.className.match(/language-(\w+)/)?.[1] || 'plaintext';
-        const code = block.textContent;
-        block.innerHTML = Prism.highlight(code, Prism.languages[language], language);
-    });
-}
-
-// Update the marked options to ensure proper code highlighting
+// Markdown configuration
 marked.setOptions({
     highlight: (code, lang) => {
         if (Prism.languages[lang]) {
@@ -31,9 +16,15 @@ marked.setOptions({
     },
     breaks: true,
     gfm: true,
-    langPrefix: 'language-'
 });
 
+// Theme management
+let currentTheme = parseInt(localStorage.getItem('theme') || '0');
+
+function applyTheme() {
+    document.body.className = themes[currentTheme];
+    themeToggle.textContent = themeIcons[currentTheme];
+}
 
 function toggleTheme() {
     currentTheme = (currentTheme + 1) % themes.length;
@@ -60,48 +51,25 @@ function saveFile() {
     URL.revokeObjectURL(url);
 }
 
+// PDF generation
 function generatePDF() {
-  const element = preview.cloneNode(true);
-  
-  // Add specific styles for PDF generation
-  const style = document.createElement('style');
-  style.textContent = `
-      body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-      pre { background-color: #f6f8fa !important; padding: 16px; border-radius: 6px; overflow-x: auto; }
-      code { font-family: monospace; }
-      .token.comment { color: #6a737d; }
-      .token.keyword { color: #d73a49; }
-      .token.string { color: #032f62; }
-      .token.function { color: #6f42c1; }
-      .token.number { color: #005cc5; }
-  `;
-  element.prepend(style);
-
-  const opt = {
-      margin: [0.75, 0.75, 0.75, 0.75],
-      filename: filename.value.replace(".md", ".pdf"),
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { 
-          scale: 2,
-          letterRendering: true,
-          useCORS: true,
-          logging: false,
-          windowWidth: 1200 // Force desktop-like rendering
-      },
-      jsPDF: { 
-          unit: "in", 
-          format: "letter", 
-          orientation: "portrait"
-      }
-  };
-
-  // Force light theme styles for PDF
-  element.querySelectorAll('pre, code').forEach(block => {
-      block.style.backgroundColor = '#f6f8fa';
-      block.style.color = '#24292e';
-  });
-
-  html2pdf().set(opt).from(element).save();
+    const element = preview.cloneNode(true);
+    const opt = {
+        margin: [0.75, 0.75, 0.75, 0.75],
+        filename: filename.value.replace(".md", ".pdf"),
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { 
+            scale: 2,
+            letterRendering: true,
+            useCORS: true
+        },
+        jsPDF: { 
+            unit: "in", 
+            format: "letter", 
+            orientation: "portrait"
+        }
+    };
+    html2pdf().set(opt).from(element).save();
 }
 
 // Initial content
