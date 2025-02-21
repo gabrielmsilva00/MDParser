@@ -1,147 +1,49 @@
-// Initialize elements and settings
-const markdown = document.getElementById("markdown");
-const preview = document.getElementById("preview");
-const filename = document.getElementById("filename");
-const themeToggle = document.querySelector('.theme-toggle');
-const themeIcons = ["✹", "✸", "✶"];
-const themes = ["theme-light", "theme-dark", "theme-black"];
+const $ = id => document.getElementById(id)
+const markdown = $('markdown')
+const preview = $('preview')
+const filename = $('filename')
+const themeIcons = ['✹', '✸', '✶']
+let theme = localStorage.getItem('theme') || 
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 1 : 0)
 
-// Markdown configuration
 marked.setOptions({
-    highlight: (code, lang) => {
-        if (Prism.languages[lang]) {
-            return Prism.highlight(code, Prism.languages[lang], lang);
-        }
-        return code;
-    },
+    highlight: (code, lang) => 
+        Prism.languages[lang] ? Prism.highlight(code, Prism.languages[lang], lang) : code,
     breaks: true,
-    gfm: true,
-});
+    gfm: true
+})
 
-// Theme management
-let currentTheme = parseInt(localStorage.getItem('theme') || '0');
-
-function applyTheme() {
-    document.body.className = themes[currentTheme];
-    themeToggle.textContent = themeIcons[currentTheme];
+const updatePreview = () => {
+    preview.innerHTML = marked.parse(markdown.value)
+    Prism.highlightAll()
 }
 
-function toggleTheme() {
-    currentTheme = (currentTheme + 1) % themes.length;
-    localStorage.setItem('theme', currentTheme.toString());
-    applyTheme();
+const saveFile = () => {
+    const blob = new Blob([markdown.value], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    Object.assign(document.createElement('a'), {
+        href: url,
+        download: filename.value
+    }).click()
+    URL.revokeObjectURL(url)
 }
 
-// Preview update function
-function updatePreview() {
-    const content = markdown.value;
-    preview.innerHTML = marked.parse(content);
-    Prism.highlightAll();
+const generatePDF = () => html2pdf().set({
+    margin: [0.75, 0.75, 0.75, 0.75],
+    filename: filename.value.replace('.md', '.pdf'),
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { scale: 2, letterRendering: true },
+    jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+}).from(preview.cloneNode(true)).save()
+
+const toggleTheme = () => {
+    theme = (theme + 1) % 3
+    document.body.className = theme === 2 ? 'theme-black' : ''
+    localStorage.setItem('theme', theme)
+    document.querySelector('.theme-toggle').textContent = themeIcons[theme]
 }
 
-// File operations
-function saveFile() {
-    const content = markdown.value;
-    const blob = new Blob([content], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename.value;
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-// PDF generation
-function generatePDF() {
-    const element = preview.cloneNode(true);
-    const opt = {
-        margin: [0.75, 0.75, 0.75, 0.75],
-        filename: filename.value.replace(".md", ".pdf"),
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { 
-            scale: 2,
-            letterRendering: true,
-            useCORS: true
-        },
-        jsPDF: { 
-            unit: "in", 
-            format: "letter", 
-            orientation: "portrait"
-        }
-    };
-    html2pdf().set(opt).from(element).save();
-}
-
-// Initial content
-const initialContent = `# Example Markdown Document
-
-Welcome to the **Custom Markdown Editor**. This editor supports _all_ of the standard GitHub-flavored
-Markdown features.
-
----
-
-## Basic Text Formatting
-
-This is a regular paragraph demonstrating **bold**, _italic_ and \`inline code\`.  
-You can also combine **bold** with *italic* if needed.
-
-## Headings
-
-Below are examples of headings from level 1 to 6:
-
-# Heading Level 1
-## Heading Level 2
-### Heading Level 3
-#### Heading Level 4
-##### Heading Level 5
-###### Heading Level 6
-
-## Lists
-
-### Unordered List
-
-- Item 1
-- Item 2
-  - Nested Item 2a
-  - Nested Item 2b
-- Item 3
-
-### Ordered List
-
-1. First item
-2. Second item
-   1. Subitem one
-   2. Subitem two
-3. Third item
-
-## Blockquotes
-
-> This is a blockquote example.  
-> It can span multiple lines and include **bold text** or other *styling*.
-
-## Code Blocks
-
-Here is a JavaScript example:
-
-\`\`\`js
-function fibonacci(n) {
-  if (n <= 1) return n
-  return fibonacci(n - 1) + fibonacci(n - 2)
-}
-console.log(fibonacci(10))
-\`\`\``;
-
-// Initialize everything when the DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    // Set initial content
-    markdown.value = initialContent;
-    
-    // Apply initial theme
-    applyTheme();
-    
-    // Set up event listeners
-    markdown.addEventListener('input', updatePreview);
-    
-    // Initial preview update
-    updatePreview();
-});
+markdown.value = `# Example Markdown Document...` // Your initial content here
+markdown.addEventListener('input', updatePreview)
+toggleTheme()
+updatePreview()

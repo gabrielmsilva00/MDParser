@@ -1,211 +1,72 @@
-:root {
-  --bg-color: #ffffff;
-  --text-color: #333333;
-  --border-color: #cccccc;
-  --editor-bg: #f5f5f5;
-}
+@media (prefers-color-scheme: dark) { :root { color-scheme: dark } }
 
-.theme-light {
-  --bg-color: #ffffff;
-  --text-color: #333333;
-  --border-color: #cccccc;
-  --editor-bg: #f5f5f5;
-}
-
-.theme-dark {
-  --bg-color: #2d2d2d;
-  --text-color: #ffffff;
-  --border-color: #555555;
-  --editor-bg: #1e1e1e;
+body {
+    margin: 0;
+    padding: 20px;
+    font-family: system-ui, sans-serif;
+    min-height: 100vh;
+    background: var(--bg, #fff);
+    color: var(--fg, #000)
 }
 
 .theme-black {
-  --bg-color: #000000;
-  --text-color: #ffffff;
-  --border-color: #333333;
-  --editor-bg: #111111;
+    --bg: #000;
+    --fg: #fff;
+    --border: #333
 }
 
-body {
-  margin: 0;
-  padding: 0;
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  min-height: 100vh;
-}
-
-.top-bar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  padding: 10px 20px;
-  z-index: 1000;
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
-
-.version {
-  font-size: 0.9em;
-  opacity: 0.7;
-}
-
-.theme-toggle {
-  background: none;
-  border: none;
-  color: var(--text-color);
-  font-size: 1.2em;
-  cursor: pointer;
-  padding: 5px;
-  transition: transform 0.3s ease;
-}
-
-.theme-toggle:hover {
-  transform: rotate(180deg);
-}
-
-.container {
-  padding: 40px;
-  max-width: 95%;
-  margin: 0 auto;
-}
+.container { max-width: 95%; margin: auto }
 
 .controls {
-  margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px
 }
 
-.controls button, .controls input {
-  padding: 8px 16px;
-  margin-right: 10px;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  background: var(--bg-color);
-  color: var(--text-color);
+.controls > * {
+    padding: 8px 16px;
+    border: 1px solid var(--border, #ccc);
+    border-radius: 4px;
+    background: var(--bg, #fff);
+    color: var(--fg, #000);
+    transition: .2s
 }
+
+.controls > button:hover { transform: translateY(-2px) }
+.controls > button:active { transform: translateY(0) }
+.controls > input { flex: 1 }
 
 .editor {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  height: calc(100vh - 140px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    height: calc(100vh - 100px)
+}
+
+#markdown, #preview {
+    padding: 20px;
+    border: 1px solid var(--border, #ccc);
+    border-radius: 4px;
+    overflow: auto
 }
 
 #markdown {
-  background: var(--editor-bg);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 20px;
-  resize: none;
-  font-family: monospace;
-  font-size: 1em;
-  line-height: 1.5;
+    resize: none;
+    font: 1em monospace;
+    background: var(--bg-alt, #f5f5f5)
 }
 
-#preview {
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 20px;
-  overflow-y: auto;
-  line-height: 1.6;
-}
-
-#preview img {
-  max-width: 100%;
-}
-
-#preview code {
-  background: var(--editor-bg);
-  padding: 2px 5px;
-  border-radius: 3px;
-}
-
-#preview pre {
-  background: var(--editor-bg);
-  padding: 15px;
-  border-radius: 4px;
-  overflow-x: auto;
-}
+#preview img { max-width: 100% }
+#preview pre { overflow-x: auto }
 
 @media (max-width: 768px) {
-  .container {
-      padding: 20px;
-  }
-  
-  .editor {
-      grid-template-columns: 1fr;
-      height: auto;
-  }
-  
-  #markdown, #preview {
-      height: 50vh;
-  }
-  
-  .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-  }
-  
-  .controls button, .controls input {
-      margin: 0;
-      flex: 1;
-  }
-}
-
-/* Add these to your existing CSS */
-.controls button, .controls input, .theme-toggle {
-  transition: all 0.3s ease;
-}
-
-.controls button:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.controls button:active {
-  transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-}
-
-.theme-toggle {
-  opacity: 0.8;
-  padding: 8px;
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-color);
-  border: 1px solid var(--border-color);
-}
-
-.theme-toggle:hover {
-  opacity: 1;
-  transform: rotate(180deg) scale(1.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-.theme-toggle:active {
-  transform: rotate(180deg) scale(0.95);
-}
-
-/* Fix PDF text clipping by adjusting preview styles */
-#preview {
-  line-height: 1.8;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-}
-
-#preview h1, #preview h2, #preview h3, #preview h4, #preview h5, #preview h6 {
-  margin: 1.5em 0 0.5em 0;
-  line-height: 1.4;
-}
-
-#preview p {
-  margin: 0 0 1em 0;
+    .editor {
+        grid-template-columns: 1fr;
+        height: auto
+    }
+    
+    #markdown, #preview { height: 50vh }
+    
+    .controls { flex-wrap: wrap }
+    .controls > button { flex: 1 }
 }
