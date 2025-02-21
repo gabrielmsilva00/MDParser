@@ -4,160 +4,143 @@
   --header-color: #555555;
   --list-color: #007acc;
   --link-color: #0645ad;
-  --primary-color: #007acc;
-  --primary-hover: #005fa3;
-  --border-color: #ddd;
-  --bg-light: #fdfdfd;
-  --text-color: #333;
-  --toolbar-bg: #f0f0f0;
-  --editor-bg: #fff;
-  --preview-bg: #fafafa;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
 }
 
 body {
+  margin: 0;
+  padding: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: var(--bg-light);
-  color: var(--text-color);
-  line-height: 1.6;
 }
 
-.app-container {
+#toolbar {
+  padding: 10px;
+  background: #f0f0f0;
+  border-bottom: 1px solid #ddd;
   display: flex;
-  height: 100vh;
-  overflow: hidden;
+  gap: 10px;
+  align-items: center;
 }
 
-.editor-section,
-.preview-section {
+#toolbar input[type="text"] {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+#toolbar button {
+  padding: 6px 12px;
+  background: #007acc;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+#toolbar button:hover {
+  background: #005fa3;
+}
+
+#container {
+  display: flex;
+  height: calc(100vh - 51px); /* Viewport height minus toolbar */
+}
+
+#editor-container, 
+#preview-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  height: 100%;
-}
-
-.toolbar {
-  padding: var(--spacing-md);
-  background: var(--toolbar-bg);
-  display: flex;
-  gap: var(--spacing-sm);
-  align-items: center;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.toolbar input[type="text"] {
-  padding: 0.5rem;
-  border: 1px solid var(--border-color);
-  border-radius: 4px;
-}
-
-.toolbar button {
-  padding: 0.5rem 1rem;
-  background: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-}
-
-.toolbar button:hover {
-  background: var(--primary-hover);
+  overflow: hidden;
 }
 
 #editor {
-  flex: 1;
-  padding: var(--spacing-md);
-  font-family: "Monaco", "Consolas", monospace;
-  font-size: 14px;
+  width: 100%;
+  height: 100%;
+  padding: 15px;
   border: none;
   resize: none;
-  background: var(--editor-bg);
-  border-right: 1px solid var(--border-color);
+  font-family: "Monaco", "Consolas", monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  border-right: 1px solid #ddd;
 }
 
 #colorPalette {
-  padding: var(--spacing-md);
-  background: white;
-  border-bottom: 1px solid var(--border-color);
+  padding: 10px;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
 }
 
 #colorPalette fieldset {
   border: none;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--spacing-sm);
+  padding: 0;
+  margin: 0;
 }
 
 #colorPalette legend {
   font-weight: bold;
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: 8px;
+}
+
+#colorPalette label {
+  display: inline-block;
+  margin-right: 15px;
+  margin-bottom: 8px;
 }
 
 #rendered {
   flex: 1;
-  padding: var(--spacing-md);
+  padding: 15px;
   overflow-y: auto;
-  background: var(--preview-bg);
+  background: #fff;
 }
 
-/* Markdown content styles remain mostly the same but simplified */
-#rendered h1 { color: var(--title-color); font-size: 2em; }
-#rendered h2 { color: var(--subtitle-color); font-size: 1.75em; }
-#rendered h3 { color: var(--header-color); font-size: 1.5em; }
-#rendered h1, #rendered h2, #rendered h3 { margin: 0.8em 0 0.4em; }
-#rendered p { margin-bottom: 1em; }
+/* Markdown Styles */
+#rendered h1 { color: var(--title-color); }
+#rendered h2 { color: var(--subtitle-color); }
+#rendered h3 { color: var(--header-color); }
 #rendered a { color: var(--link-color); }
-#rendered ul, #rendered ol { margin: 0 0 1em 1.5em; }
 #rendered li::marker { color: var(--list-color); }
 
-/* Code blocks */
 #rendered pre {
   background: #f6f8fa;
-  padding: var(--spacing-md);
+  padding: 15px;
   border-radius: 4px;
   overflow-x: auto;
-  margin: var(--spacing-md) 0;
 }
 
-/* Responsive design */
+#rendered code {
+  font-family: "Monaco", "Consolas", monospace;
+}
+
+/* Mobile Responsive */
 @media (max-width: 768px) {
-  .app-container {
+  #container {
     flex-direction: column;
   }
   
-  .editor-section,
-  .preview-section {
-    flex: none;
+  #editor-container,
+  #preview-container {
     height: 50vh;
   }
   
   #editor {
     border-right: none;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid #ddd;
   }
 }
 
-/* Print styles */
+/* Print Styles */
 @media print {
-  .editor-section,
-  #colorPalette {
+  #toolbar, #editor-container, #colorPalette {
     display: none;
   }
   
-  .preview-section {
-    height: auto;
+  #preview-container {
+    width: 100%;
   }
   
   #rendered {
-    padding: 2cm;
+    padding: 20px;
   }
 }
