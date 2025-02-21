@@ -39,7 +39,7 @@ fetch("example.md")
   })
   .catch(console.error)
 
-// Update CSS custom properties when a color input changes
+// Update custom properties based on palette changes
 [
   { el: colorTitle, prop: "--title-color" },
   { el: colorSubtitle, prop: "--subtitle-color" },
@@ -47,29 +47,7 @@ fetch("example.md")
   { el: colorList, prop: "--list-color" },
   { el: colorLink, prop: "--link-color" }
 ].forEach(({ el, prop }) => {
-  el.addEventListener("change", e => {
+  el.addEventListener("change", e =>
     document.documentElement.style.setProperty(prop, e.target.value)
-  })
+  )
 })
-
-// Mobile tab switching logic
-const tabEditor = document.getElementById("tabEditor")
-const tabPreview = document.getElementById("tabPreview")
-const container = document.getElementById("container")
-
-if (tabEditor && tabPreview && container) {
-  tabEditor.addEventListener("click", () => {
-    container.classList.add("show-editor")
-    container.classList.remove("show-preview")
-    tabEditor.classList.add("active")
-    tabPreview.classList.remove("active")
-  })
-  tabPreview.addEventListener("click", () => {
-    container.classList.add("show-preview")
-    container.classList.remove("show-editor")
-    tabPreview.classList.add("active")
-    tabEditor.classList.remove("active")
-  })
-  // Default to showing the editor on mobile.
-  container.classList.add("show-editor")
-}
