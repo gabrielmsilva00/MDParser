@@ -1,78 +1,79 @@
+// Initialize elements and settings
 const markdown = document.getElementById("markdown");
 const preview = document.getElementById("preview");
 const filename = document.getElementById("filename");
-
-marked.setOptions({
-  highlight: (code, lang) => {
-    if (Prism.languages[lang]) {
-      return Prism.highlight(code, Prism.languages[lang], lang);
-    }
-    return code;
-  },
-  breaks: true,
-  gfm: true,
-});
-
-const updatePreview = () => {
-  const content = markdown.value;
-  preview.innerHTML = marked.parse(content);
-  Prism.highlightAll();
-};
-
-markdown.addEventListener("input", updatePreview);
-
-const saveFile = () => {
-  const content = markdown.value;
-  const blob = new Blob([content], { type: "text/markdown" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename.value;
-  a.click();
-  URL.revokeObjectURL(url);
-};
-
-const generatePDF = () => {
-  const element = preview.cloneNode(true);
-  const opt = {
-      margin: [0.75, 0.75, 0.75, 0.75],
-      filename: filename.value.replace(".md", ".pdf"),
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { 
-          scale: 2,
-          letterRendering: true,
-          useCORS: true
-      },
-      jsPDF: { 
-          unit: "in", 
-          format: "letter", 
-          orientation: "portrait"
-      }
-  };
-  html2pdf().set(opt).from(element).save();
-};
-
+const themeToggle = document.querySelector('.theme-toggle');
 const themeIcons = ["✹", "✸", "✶"];
 const themes = ["theme-light", "theme-dark", "theme-black"];
 
-// Load theme from localStorage or default to 0
-let currentTheme = parseInt(localStorage.getItem('theme')) || 0;
+// Markdown configuration
+marked.setOptions({
+    highlight: (code, lang) => {
+        if (Prism.languages[lang]) {
+            return Prism.highlight(code, Prism.languages[lang], lang);
+        }
+        return code;
+    },
+    breaks: true,
+    gfm: true,
+});
 
-const toggleTheme = () => {
-    currentTheme = (currentTheme + 1) % themes.length;
-    applyTheme();
-    localStorage.setItem('theme', currentTheme);
-};
+// Theme management
+let currentTheme = parseInt(localStorage.getItem('theme') || '0');
 
-const applyTheme = () => {
+function applyTheme() {
     document.body.className = themes[currentTheme];
-    document.querySelector('.theme-toggle').textContent = themeIcons[currentTheme];
-};
+    themeToggle.textContent = themeIcons[currentTheme];
+}
 
-// Apply theme on load
-window.addEventListener('DOMContentLoaded', applyTheme);
+function toggleTheme() {
+    currentTheme = (currentTheme + 1) % themes.length;
+    localStorage.setItem('theme', currentTheme.toString());
+    applyTheme();
+}
 
-markdown.value = `# Example Markdown Document
+// Preview update function
+function updatePreview() {
+    const content = markdown.value;
+    preview.innerHTML = marked.parse(content);
+    Prism.highlightAll();
+}
+
+// File operations
+function saveFile() {
+    const content = markdown.value;
+    const blob = new Blob([content], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename.value;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+// PDF generation
+function generatePDF() {
+    const element = preview.cloneNode(true);
+    const opt = {
+        margin: [0.75, 0.75, 0.75, 0.75],
+        filename: filename.value.replace(".md", ".pdf"),
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { 
+            scale: 2,
+            letterRendering: true,
+            useCORS: true
+        },
+        jsPDF: { 
+            unit: "in", 
+            format: "letter", 
+            orientation: "portrait"
+        }
+    };
+    html2pdf().set(opt).from(element).save();
+}
+
+// Initial content
+const initialContent = `# Example Markdown Document
 
 Welcome to the **Custom Markdown Editor**. This editor supports _all_ of the standard GitHub-flavored
 Markdown features.
@@ -130,4 +131,17 @@ function fibonacci(n) {
 console.log(fibonacci(10))
 \`\`\``;
 
-updatePreview();
+// Initialize everything when the DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    // Set initial content
+    markdown.value = initialContent;
+    
+    // Apply initial theme
+    applyTheme();
+    
+    // Set up event listeners
+    markdown.addEventListener('input', updatePreview);
+    
+    // Initial preview update
+    updatePreview();
+});
