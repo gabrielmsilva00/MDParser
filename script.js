@@ -44,12 +44,13 @@ const generatePDF = () => {
   html2pdf().set(opt).from(element).save();
 };
 
-const themes = ["theme-light", "theme-dark", "theme-black"];
+const themeIcons = ["✹", "✸", "✶"];
 let currentTheme = 0;
 
 const toggleTheme = () => {
   currentTheme = (currentTheme + 1) % themes.length;
   document.body.className = themes[currentTheme];
+  document.querySelector('.theme-toggle').textContent = themeIcons[currentTheme];
 };
 
 markdown.value = `# Example Markdown Document

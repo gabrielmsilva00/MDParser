@@ -28,15 +28,47 @@
 
 body {
   margin: 0;
-  padding: 20px;
+  padding: 0;
   background-color: var(--bg-color);
   color: var(--text-color);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
       Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  min-height: 100vh;
+}
+
+.top-bar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 10px 20px;
+  z-index: 1000;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+.version {
+  font-size: 0.9em;
+  opacity: 0.7;
+}
+
+.theme-toggle {
+  background: none;
+  border: none;
+  color: var(--text-color);
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 5px;
+  transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover {
+  transform: rotate(180deg);
 }
 
 .container {
-  max-width: 1200px;
+  padding: 40px;
+  max-width: 95%;
   margin: 0 auto;
 }
 
@@ -57,7 +89,7 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 140px);
 }
 
 #markdown {
@@ -65,17 +97,20 @@ body {
   color: var(--text-color);
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  padding: 15px;
+  padding: 20px;
   resize: none;
   font-family: monospace;
+  font-size: 1em;
+  line-height: 1.5;
 }
 
 #preview {
   background: var(--bg-color);
   border: 1px solid var(--border-color);
   border-radius: 4px;
-  padding: 15px;
+  padding: 20px;
   overflow-y: auto;
+  line-height: 1.6;
 }
 
 #preview img {
@@ -93,4 +128,30 @@ body {
   padding: 15px;
   border-radius: 4px;
   overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .container {
+      padding: 20px;
+  }
+  
+  .editor {
+      grid-template-columns: 1fr;
+      height: auto;
+  }
+  
+  #markdown, #preview {
+      height: 50vh;
+  }
+  
+  .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+  }
+  
+  .controls button, .controls input {
+      margin: 0;
+      flex: 1;
+  }
 }
