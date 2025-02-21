@@ -19,25 +19,35 @@
       <button id="saveFile">Save File</button>
       <button id="printPDF">Print as PDF</button>
     </div>
+    <!-- Tab bar (visible only on mobile) -->
+    <div id="tabBar">
+      <button id="tabEditor" class="active">Editor</button>
+      <button id="tabPreview">Preview</button>
+    </div>
     <div id="container">
       <textarea id="editor"></textarea>
       <div id="preview">
         <div id="colorPalette">
           <fieldset>
             <legend>Customize Colors (optional)</legend>
-            <label>Title (#):
+            <label>
+              Title (#):
               <input id="color-title" type="color" value="#000000" />
             </label>
-            <label>Subtitle (##):
+            <label>
+              Subtitle (##):
               <input id="color-subtitle" type="color" value="#333333" />
             </label>
-            <label>Header (###):
+            <label>
+              Header (###):
               <input id="color-header" type="color" value="#555555" />
             </label>
-            <label>Lists:
+            <label>
+              Lists:
               <input id="color-list" type="color" value="#007acc" />
             </label>
-            <label>Links:
+            <label>
+              Links:
               <input id="color-link" type="color" value="#0645ad" />
             </label>
           </fieldset>
