@@ -1,146 +1,181 @@
-:root {
-  --title-color: #000000;
-  --subtitle-color: #333333;
-  --header-color: #555555;
-  --list-color: #007acc;
-  --link-color: #0645ad;
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Consolas', 'Monaco', monospace;
+  background: #1e1e1e;
+  color: #ffffff;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
+/* Toolbar styles */
 #toolbar {
-  padding: 10px;
-  background: #f0f0f0;
-  border-bottom: 1px solid #ddd;
+  background: #2d2d2d;
+  padding: 8px;
+  border-bottom: 1px solid #3d3d3d;
   display: flex;
   gap: 10px;
   align-items: center;
 }
 
+#toolbar label {
+  color: #ffffff;
+}
+
 #toolbar input[type="text"] {
-  padding: 5px;
-  border: 1px solid #ccc;
+  background: #3d3d3d;
+  border: 1px solid #555;
+  color: #ffffff;
+  padding: 4px 8px;
   border-radius: 3px;
 }
 
 #toolbar button {
-  padding: 6px 12px;
-  background: #007acc;
+  background: #0078d4;
   color: white;
   border: none;
+  padding: 4px 12px;
   border-radius: 3px;
   cursor: pointer;
 }
 
 #toolbar button:hover {
-  background: #005fa3;
+  background: #0066b5;
 }
 
+/* Main container */
 #container {
   display: flex;
-  height: calc(100vh - 51px); /* Viewport height minus toolbar */
+  flex: 1;
+  min-height: 0; /* Important for Firefox */
 }
 
-#editor-container, 
+/* Editor side */
+#editor-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #3d3d3d;
+}
+
+#editor {
+  flex: 1;
+  background: #1e1e1e;
+  color: #ffffff;
+  padding: 15px;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  border: none;
+  resize: none;
+  outline: none;
+  width: 100%;
+  height: 100%;
+}
+
+/* Preview side */
 #preview-container {
   flex: 1;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  background: #1e1e1e;
 }
 
-#editor {
-  width: 100%;
-  height: 100%;
-  padding: 15px;
-  border: none;
-  resize: none;
-  font-family: "Monaco", "Consolas", monospace;
-  font-size: 14px;
-  line-height: 1.6;
-  border-right: 1px solid #ddd;
-}
-
+/* Color palette */
 #colorPalette {
+  background: #2d2d2d;
   padding: 10px;
-  background: #fff;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #3d3d3d;
 }
 
 #colorPalette fieldset {
   border: none;
-  padding: 0;
-  margin: 0;
 }
 
 #colorPalette legend {
-  font-weight: bold;
+  color: #ffffff;
   margin-bottom: 8px;
 }
 
 #colorPalette label {
+  color: #ffffff;
   display: inline-block;
   margin-right: 15px;
   margin-bottom: 8px;
 }
 
+/* Rendered markdown */
 #rendered {
   flex: 1;
   padding: 15px;
   overflow-y: auto;
-  background: #fff;
+  color: #ffffff;
+  background: #1e1e1e;
 }
 
-/* Markdown Styles */
-#rendered h1 { color: var(--title-color); }
-#rendered h2 { color: var(--subtitle-color); }
-#rendered h3 { color: var(--header-color); }
-#rendered a { color: var(--link-color); }
-#rendered li::marker { color: var(--list-color); }
+/* Markdown content styles */
+#rendered h1 { color: var(--title-color, #ffffff); }
+#rendered h2 { color: var(--subtitle-color, #e0e0e0); }
+#rendered h3 { color: var(--header-color, #cccccc); }
+#rendered a { color: var(--link-color, #0078d4); }
+#rendered li::marker { color: var(--list-color, #0078d4); }
 
 #rendered pre {
-  background: #f6f8fa;
+  background: #2d2d2d;
   padding: 15px;
   border-radius: 4px;
   overflow-x: auto;
+  margin: 10px 0;
 }
 
 #rendered code {
-  font-family: "Monaco", "Consolas", monospace;
+  font-family: 'Consolas', 'Monaco', monospace;
+  background: #2d2d2d;
+  padding: 2px 5px;
+  border-radius: 3px;
 }
 
-/* Mobile Responsive */
+/* Mobile responsive */
 @media (max-width: 768px) {
   #container {
     flex-direction: column;
   }
-  
+
   #editor-container,
   #preview-container {
-    height: 50vh;
-  }
-  
-  #editor {
-    border-right: none;
-    border-bottom: 1px solid #ddd;
+    flex: 1;
+    min-height: 50vh;
   }
 }
 
-/* Print Styles */
+/* Print styles */
 @media print {
-  #toolbar, #editor-container, #colorPalette {
+  body {
+    background: white;
+    color: black;
+  }
+
+  #toolbar,
+  #editor-container,
+  #colorPalette {
     display: none;
   }
-  
+
   #preview-container {
     width: 100%;
   }
-  
+
   #rendered {
     padding: 20px;
+    color: black;
+    background: white;
   }
 }
