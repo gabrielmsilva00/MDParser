@@ -84,12 +84,43 @@ const saveFile = () => {
     URL.revokeObjectURL(url)
 }
 
-const generatePDF = () => {
+// Replace the theme management code with this improved version:
+const themeIcons = ['✹', '✸', '✶']
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)')
+let theme = parseInt(localStorage.getItem('theme')) ?? (prefersDark.matches ? 1 : 0)
+
+const toggleTheme = () => {
+    theme = (theme + 1) % 3
+    localStorage.setItem('theme', theme)
+    applyTheme()
+}
+
+const applyTheme = () => {
+    const isDark = theme === 1 || (theme === null && prefersDark.matches)
+    document.body.className = theme === 2 ? 'theme-black' : 
+                            isDark ? 'theme-dark' : ''
+    themeBtn.textContent = themeIcons[theme]
+}
+
+// And replace the generatePDF function with this improved version:
+const generatePDF = async () => {
     const isMobile = window.innerWidth <= 768
     const element = preview.cloneNode(true)
     
     if (isMobile) {
-        // Apply desktop-like styling for PDF generation
+        // Save current viewport meta
+        const viewport = document.querySelector('meta[name="viewport"]')
+        const originalContent = viewport.content
+        
+        // Create temporary container
+        const container = document.createElement('div')
+        Object.assign(container.style, {
+            position: 'absolute',
+            left: '-9999px',
+            width: '1100px'
+        })
+        
+        // Style the element for PDF
         Object.assign(element.style, {
             width: '1100px',
             padding: '20px',
@@ -97,7 +128,7 @@ const generatePDF = () => {
             color: 'var(--fg)'
         })
         
-        // Force proper code block rendering
+        // Style code blocks
         element.querySelectorAll('pre').forEach(pre => {
             Object.assign(pre.style, {
                 backgroundColor: 'var(--code-bg)',
@@ -117,66 +148,56 @@ const generatePDF = () => {
                 })
             }
         })
-    }
-
-    const opt = {
-        margin: 0.5,
-        filename: filename.value.replace('.md', '.pdf'),
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2,
-            letterRendering: true,
-            useCORS: true,
-            width: isMobile ? 1100 : undefined,
-            windowWidth: isMobile ? 1100 : undefined
-        },
-        jsPDF: { 
-            unit: 'in', 
-            format: 'letter', 
-            orientation: 'portrait'
-        }
-    }
-
-    // Create temporary container for PDF generation
-    if (isMobile) {
-        const container = document.createElement('div')
-        container.style.position = 'absolute'
-        container.style.left = '-9999px'
-        container.style.width = '1100px'
+        
+        // Add to DOM temporarily
         container.appendChild(element)
         document.body.appendChild(container)
         
-        html2pdf().set(opt).from(element).save().then(() => {
+        // Change viewport temporarily
+        viewport.content = 'width=1100'
+        
+        try {
+            await html2pdf().set({
+                margin: 0.5,
+                filename: filename.value.replace('.md', '.pdf'),
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { 
+                    scale: 2,
+                    letterRendering: true,
+                    useCORS: true,
+                    width: 1100,
+                    windowWidth: 1100
+                },
+                jsPDF: { 
+                    unit: 'in', 
+                    format: 'letter', 
+                    orientation: 'portrait'
+                }
+            }).from(element).save()
+        } finally {
+            // Cleanup
             container.remove()
-        })
+            viewport.content = originalContent
+        }
     } else {
-        html2pdf().set(opt).from(element).save()
+        // Desktop version remains the same
+        html2pdf().set({
+            margin: 0.5,
+            filename: filename.value.replace('.md', '.pdf'),
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { 
+                scale: 2,
+                letterRendering: true,
+                useCORS: true
+            },
+            jsPDF: { 
+                unit: 'in', 
+                format: 'letter', 
+                orientation: 'portrait'
+            }
+        }).from(element).save()
     }
 }
-
-const themeIcons = ['✹', '✸', '✶']
-const prefersDark = window.matchMedia('(prefers-color-scheme: dark)')
-let theme = parseInt(localStorage.getItem('theme') ?? 
-    (prefersDark.matches ? '1' : '0'))
-
-const toggleTheme = () => {
-    theme = (theme + 1) % 3
-    applyTheme()
-    localStorage.setItem('theme', theme)
-}
-
-const applyTheme = () => {
-    document.body.className = theme === 2 ? 'theme-black' : 
-        theme === 1 ? 'theme-dark' : ''
-    themeBtn.textContent = themeIcons[theme]
-}
-
-prefersDark.addEventListener('change', e => {
-    if (localStorage.getItem('theme') === null) {
-        theme = e.matches ? 1 : 0
-        applyTheme()
-    }
-})
 
 saveBtn.onclick = saveFile
 printBtn.onclick = generatePDF
@@ -184,5 +205,5 @@ themeBtn.onclick = toggleTheme
 markdown.oninput = updatePreview
 
 markdown.value = initialContent
-toggleTheme()
+applyTheme()
 updatePreview()
