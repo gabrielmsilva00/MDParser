@@ -3,30 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="A lightweight Markdown editor with live preview">
     <title>Markdown Parser</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/themes/prism.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
-<body>
+<body class="theme-light">
     <div class="top-bar">
-        <span class="version">v0.0.2</span>
-        <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme">✹</button>
+        <span class="version">v0.0.1</span>
+        <button onclick="toggleTheme()" class="theme-toggle">✹</button>
     </div>
     <div class="container">
         <div class="controls">
-            <input type="text" id="filename" value="example.md" aria-label="Filename">
-            <button id="saveBtn">Save</button>
-            <button id="printBtn">Print</button>
+            <input type="text" id="filename" value="example.md">
+            <button onclick="saveFile()">Save</button>
+            <button onclick="generatePDF()">Print</button>
         </div>
         <div class="editor">
-            <textarea id="markdown" aria-label="Markdown input"></textarea>
-            <div id="preview" role="region" aria-label="Preview"></div>
+            <textarea id="markdown"></textarea>
+            <div id="preview"></div>
         </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.24.1/prism.min.js" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" defer></script>
-    <script src="script.js" defer></script>
+    <script src="script.js"></script>
 </body>
 </html>

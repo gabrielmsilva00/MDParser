@@ -186,12 +186,12 @@ body {
 
 .theme-toggle:hover {
   opacity: 1;
-  transform: rotate(360deg) scale(1);
+  transform: rotate(180deg) scale(1.1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .theme-toggle:active {
-  transform: rotate(360deg) scale(1);
+  transform: rotate(180deg) scale(0.95);
 }
 
 /* Fix PDF text clipping by adjusting preview styles */
