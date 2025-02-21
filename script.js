@@ -2,7 +2,6 @@ const $ = id => document.getElementById(id)
 const markdown = $('markdown')
 const preview = $('preview')
 const filename = $('filename')
-const themeBtn = $('themeBtn')
 const saveBtn = $('saveBtn')
 const printBtn = $('printBtn')
 
@@ -84,126 +83,71 @@ const saveFile = () => {
     URL.revokeObjectURL(url)
 }
 
-// Replace the theme management code with this improved version:
-const themeIcons = ['✹', '✸', '✶']
-const prefersDark = window.matchMedia('(prefers-color-scheme: dark)')
-let theme = parseInt(localStorage.getItem('theme')) ?? (prefersDark.matches ? 1 : 0)
-
-const toggleTheme = () => {
-    theme = (theme + 1) % 3
-    localStorage.setItem('theme', theme)
-    applyTheme()
-}
-
-const applyTheme = () => {
-    const isDark = theme === 1 || (theme === null && prefersDark.matches)
-    document.body.className = theme === 2 ? 'theme-black' : 
-                            isDark ? 'theme-dark' : ''
-    themeBtn.textContent = themeIcons[theme]
-}
-
-// And replace the generatePDF function with this improved version:
 const generatePDF = async () => {
-    const isMobile = window.innerWidth <= 768
-    const element = preview.cloneNode(true)
+    const iframe = document.createElement('iframe')
+    Object.assign(iframe.style, {
+        position: 'absolute',
+        top: '-9999px',
+        width: '1100px',
+        height: '100%',
+        border: 'none'
+    })
     
-    if (isMobile) {
-        // Save current viewport meta
-        const viewport = document.querySelector('meta[name="viewport"]')
-        const originalContent = viewport.content
-        
-        // Create temporary container
-        const container = document.createElement('div')
-        Object.assign(container.style, {
-            position: 'absolute',
-            left: '-9999px',
-            width: '1100px'
-        })
-        
-        // Style the element for PDF
-        Object.assign(element.style, {
-            width: '1100px',
-            padding: '20px',
-            backgroundColor: 'var(--bg)',
-            color: 'var(--fg)'
-        })
-        
-        // Style code blocks
-        element.querySelectorAll('pre').forEach(pre => {
-            Object.assign(pre.style, {
-                backgroundColor: 'var(--code-bg)',
-                border: '1px solid var(--code-border)',
-                padding: '16px',
-                borderRadius: '6px',
-                overflow: 'auto'
-            })
-        })
-        
-        element.querySelectorAll('code').forEach(code => {
-            if (!code.parentElement.matches('pre')) {
-                Object.assign(code.style, {
-                    backgroundColor: 'var(--code-bg)',
-                    padding: '2px 4px',
-                    borderRadius: '3px'
-                })
-            }
-        })
-        
-        // Add to DOM temporarily
-        container.appendChild(element)
-        document.body.appendChild(container)
-        
-        // Change viewport temporarily
-        viewport.content = 'width=1100'
-        
-        try {
-            await html2pdf().set({
-                margin: 0.5,
-                filename: filename.value.replace('.md', '.pdf'),
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { 
-                    scale: 2,
-                    letterRendering: true,
-                    useCORS: true,
-                    width: 1100,
-                    windowWidth: 1100
-                },
-                jsPDF: { 
-                    unit: 'in', 
-                    format: 'letter', 
-                    orientation: 'portrait'
-                }
-            }).from(element).save()
-        } finally {
-            // Cleanup
-            container.remove()
-            viewport.content = originalContent
-        }
-    } else {
-        // Desktop version remains the same
-        html2pdf().set({
+    document.body.appendChild(iframe)
+    const doc = iframe.contentDocument || iframe.contentWindow.document
+    const styles = getComputedStyle(document.body)
+    
+    doc.write(`
+        <style>
+            body{margin:0;padding:20px;font:14px system-ui,sans-serif;background:${styles.getPropertyValue('--bg')};color:${styles.getPropertyValue('--fg')}}
+            pre{background:${styles.getPropertyValue('--code-bg')};border:1px solid ${styles.getPropertyValue('--code-border')};padding:16px;border-radius:6px}
+            code{background:${styles.getPropertyValue('--code-bg')};padding:2px 4px;border-radius:3px}
+            pre code{background:none;padding:0}
+        </style>
+        ${preview.innerHTML}
+    `)
+    doc.close()
+    
+    try {
+        await html2pdf().set({
             margin: 0.5,
             filename: filename.value.replace('.md', '.pdf'),
             image: { type: 'jpeg', quality: 0.98 },
             html2canvas: { 
                 scale: 2,
                 letterRendering: true,
-                useCORS: true
+                useCORS: true,
+                scrollY: -window.scrollY,
+                windowWidth: 1100
             },
-            jsPDF: { 
-                unit: 'in', 
-                format: 'letter', 
-                orientation: 'portrait'
-            }
-        }).from(element).save()
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        }).from(doc.body).save()
+    } finally {
+        iframe.remove()
     }
 }
 
+const themes = ['theme-light', 'theme-dark', 'theme-black']
+const themeButtons = document.querySelectorAll('.theme-opt')
+let currentTheme = parseInt(localStorage.getItem('theme') || '1')
+
+const applyTheme = (index) => {
+    document.body.className = themes[index]
+    themeButtons.forEach(btn => 
+        btn.classList.toggle('active', parseInt(btn.dataset.theme) === index))
+}
+
+themeButtons.forEach(btn => 
+    btn.onclick = () => {
+        currentTheme = parseInt(btn.dataset.theme)
+        localStorage.setItem('theme', currentTheme)
+        applyTheme(currentTheme)
+    })
+
 saveBtn.onclick = saveFile
 printBtn.onclick = generatePDF
-themeBtn.onclick = toggleTheme
 markdown.oninput = updatePreview
 
 markdown.value = initialContent
-applyTheme()
+applyTheme(currentTheme)
 updatePreview()
