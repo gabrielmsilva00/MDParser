@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <title>Custom Markdown Editor</title>
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="style.css?v=0.0.1" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/github.min.css"
@@ -12,30 +12,36 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   </head>
   <body>
-    <div id="toolbar">
-      <label for="fileName">File Name:</label>
-      <input id="fileName" type="text" value="example.md" />
-      <button id="saveFile">Save File</button>
-      <button id="printPDF">Print as PDF</button>
-    </div>
-    <div id="container">
-      <div id="editor-container">
-        <textarea id="editor"></textarea>
-      </div>
-      <div id="preview-container">
-        <div id="colorPalette">
-          <fieldset>
-            <legend>Customize Colors</legend>
-            <label>Title (#): <input id="color-title" type="color" value="#000000" /></label>
-            <label>Subtitle (##): <input id="color-subtitle" type="color" value="#333333" /></label>
-            <label>Header (###): <input id="color-header" type="color" value="#555555" /></label>
-            <label>Lists: <input id="color-list" type="color" value="#007acc" /></label>
-            <label>Links: <input id="color-link" type="color" value="#0645ad" /></label>
-          </fieldset>
+    <div class="version">v0.0.1</div>
+    <div class="main-container">
+      <div class="split-view">
+        <div class="left-panel">
+          <div class="toolbar">
+            <label for="fileName">File Name:</label>
+            <input id="fileName" type="text" value="example.md" />
+            <button id="saveFile">Save File</button>
+            <button id="printPDF">Print as PDF</button>
+          </div>
+          <textarea id="editor" spellcheck="false"></textarea>
         </div>
-        <div id="rendered"></div>
+        
+        <div class="right-panel">
+          <div id="colorPalette">
+            <fieldset>
+              <legend>Customize Colors</legend>
+              <div class="color-inputs">
+                <label>Title (#): <input id="color-title" type="color" value="#000000" /></label>
+                <label>Subtitle (##): <input id="color-subtitle" type="color" value="#333333" /></label>
+                <label>Header (###): <input id="color-header" type="color" value="#555555" /></label>
+                <label>Lists: <input id="color-list" type="color" value="#007acc" /></label>
+                <label>Links: <input id="color-link" type="color" value="#0645ad" /></label>
+              </div>
+            </fieldset>
+          </div>
+          <div id="rendered"></div>
+        </div>
       </div>
     </div>
-    <script src="script.js"></script>
+    <script src="script.js?v=0.0.1"></script>
   </body>
 </html>
