@@ -35,23 +35,42 @@ const saveFile = () => {
 const generatePDF = () => {
   const element = preview.cloneNode(true);
   const opt = {
-    margin: 1,
-    filename: filename.value.replace(".md", ".pdf"),
-    image: { type: "jpeg", quality: 0.98 },
-    html2canvas: { scale: 2 },
-    jsPDF: { unit: "in", format: "letter", orientation: "portrait" },
+      margin: [0.75, 0.75, 0.75, 0.75],
+      filename: filename.value.replace(".md", ".pdf"),
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { 
+          scale: 2,
+          letterRendering: true,
+          useCORS: true
+      },
+      jsPDF: { 
+          unit: "in", 
+          format: "letter", 
+          orientation: "portrait"
+      }
   };
   html2pdf().set(opt).from(element).save();
 };
 
 const themeIcons = ["✹", "✸", "✶"];
-let currentTheme = 0;
+const themes = ["theme-light", "theme-dark", "theme-black"];
+
+// Load theme from localStorage or default to 0
+let currentTheme = parseInt(localStorage.getItem('theme')) || 0;
 
 const toggleTheme = () => {
-  currentTheme = (currentTheme + 1) % themes.length;
-  document.body.className = themes[currentTheme];
-  document.querySelector('.theme-toggle').textContent = themeIcons[currentTheme];
+    currentTheme = (currentTheme + 1) % themes.length;
+    applyTheme();
+    localStorage.setItem('theme', currentTheme);
 };
+
+const applyTheme = () => {
+    document.body.className = themes[currentTheme];
+    document.querySelector('.theme-toggle').textContent = themeIcons[currentTheme];
+};
+
+// Apply theme on load
+window.addEventListener('DOMContentLoaded', applyTheme);
 
 markdown.value = `# Example Markdown Document
 

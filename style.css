@@ -155,3 +155,57 @@ body {
       flex: 1;
   }
 }
+
+/* Add these to your existing CSS */
+.controls button, .controls input, .theme-toggle {
+  transition: all 0.3s ease;
+}
+
+.controls button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.controls button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.theme-toggle {
+  opacity: 0.8;
+  padding: 8px;
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+}
+
+.theme-toggle:hover {
+  opacity: 1;
+  transform: rotate(180deg) scale(1.1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.theme-toggle:active {
+  transform: rotate(180deg) scale(0.95);
+}
+
+/* Fix PDF text clipping by adjusting preview styles */
+#preview {
+  line-height: 1.8;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+#preview h1, #preview h2, #preview h3, #preview h4, #preview h5, #preview h6 {
+  margin: 1.5em 0 0.5em 0;
+  line-height: 1.4;
+}
+
+#preview p {
+  margin: 0 0 1em 0;
+}
