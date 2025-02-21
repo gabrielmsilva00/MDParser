@@ -1,0 +1,192 @@
+:root {
+  --title-color: #000000;
+  --subtitle-color: #333333;
+  --header-color: #555555;
+  --list-color: #007acc;
+  --link-color: #0645ad;
+  --bg-light: #fdfdfd;
+  --text-color: #333;
+  --toolbar-bg: #f0f0f0;
+  --editor-bg: #fff;
+  --preview-bg: #fafafa;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-light);
+  color: var(--text-color);
+}
+
+#toolbar {
+  padding: 10px 20px;
+  background: var(--toolbar-bg);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#toolbar label {
+  font-weight: bold;
+}
+
+#toolbar input[type="text"] {
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+}
+
+#toolbar button {
+  padding: 6px 12px;
+  border: none;
+  background: #007acc;
+  color: #fff;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+#toolbar button:hover {
+  background: #005fa3;
+}
+
+#container {
+  display: flex;
+  height: calc(100vh - 60px);
+}
+
+#editor,
+#preview {
+  width: 50%;
+  padding: 20px;
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+#editor {
+  border-right: 1px solid #ddd;
+  background: var(--editor-bg);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 14px;
+  line-height: 1.6;
+  resize: none;
+}
+
+#preview {
+  background: var(--preview-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+#colorPalette {
+  margin-bottom: 20px;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+#colorPalette fieldset {
+  border: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+#colorPalette legend {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+#colorPalette label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+}
+
+#rendered {
+  flex: 1;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+/* Markdown content styles */
+#rendered h1 {
+  color: var(--title-color);
+  font-size: 2em;
+  margin: 0.6em 0 0.3em;
+}
+
+#rendered h2 {
+  color: var(--subtitle-color);
+  font-size: 1.75em;
+  margin: 0.6em 0 0.3em;
+}
+
+#rendered h3 {
+  color: var(--header-color);
+  font-size: 1.5em;
+  margin: 0.6em 0 0.3em;
+}
+
+#rendered h4,
+#rendered h5,
+#rendered h6 {
+  margin: 0.6em 0 0.3em;
+}
+
+#rendered p {
+  line-height: 1.6;
+  margin-bottom: 1em;
+}
+
+#rendered ul,
+#rendered ol {
+  margin: 0 0 1em 1.5em;
+}
+
+#rendered li::marker {
+  color: var(--list-color);
+}
+
+#rendered a {
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+pre {
+  background: #f6f8fa;
+  padding: 10px;
+  overflow-x: auto;
+  border-radius: 4px;
+  margin-bottom: 1em;
+}
+
+code {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 0.95em;
+}
+
+/* Print: show preview (including custom colors) only */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  #preview,
+  #preview * {
+    visibility: visible;
+  }
+  #preview {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 20px;
+  }
+}
