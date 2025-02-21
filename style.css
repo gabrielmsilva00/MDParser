@@ -216,16 +216,13 @@ body {
     height: 100vh;
     padding: 0;
   }
-
   body {
     padding: 10px;
   }
-
   .editor {
     grid-template-columns: 1fr;
     height: auto;
   }
-
   #markdown,
   #preview {
     height: 50vh;

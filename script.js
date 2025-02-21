@@ -84,19 +84,21 @@ const saveFile = () => {
 };
 
 const generatePDF = async () => {
-  // Create a temporary container (hidden off-screen) with a fixed desktop width
+  // Create a temporary container off-screen with fixed desktop width
   const container = document.createElement('div');
   container.style.position = 'absolute';
-  container.style.top = '-9999px';
+  container.style.top = '-10000px';
   container.style.left = '0';
   container.style.width = '1100px';
-  // Ensure the container expands as needed
-  container.style.minHeight = '100vh';
-  container.style.visibility = 'hidden';
-  const clone = preview.cloneNode(true);
-  container.appendChild(clone);
+  container.style.height = 'auto';
+  container.style.opacity = '0';
   document.body.appendChild(container);
-
+  
+  // Copy preview content (with its inner HTML)
+  container.innerHTML = preview.innerHTML;
+  // Allow for layout recalculation
+  await new Promise(resolve => setTimeout(resolve, 100));
+  
   try {
     await html2pdf().set({
       margin: 0.5,
