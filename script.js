@@ -83,23 +83,33 @@ const saveFile = () => {
   URL.revokeObjectURL(url);
 };
 
+// ------ NEW PRINT-TO-PDF LOGIC (v0.0.13) ------
+
 const generatePDF = async () => {
-  // Create an off-screen container (do NOT use opacity: 0)
+  // Clone the preview node to capture current rendered content
+  const clone = preview.cloneNode(true);
+  // Create a temporary container with a fixed desktop width.
   const container = document.createElement('div');
   container.style.position = 'absolute';
-  container.style.left = '-10000px';
+  container.style.left = '0';
   container.style.top = '0';
   container.style.width = '1100px';
-  container.style.height = 'auto';
-  container.style.display = 'block';
-  // Clone the preview (with all its content and styling)
-  const clone = preview.cloneNode(true);
+  container.style.background = getComputedStyle(document.body).getPropertyValue('--bg');
+  container.style.color = getComputedStyle(document.body).getPropertyValue('--fg');
+  // Append a style block that forces all elements to avoid page breaks inside.
+  const styleBlock = document.createElement('style');
+  styleBlock.textContent = `
+    * { page-break-inside: avoid; }
+    pre, code { white-space: pre-wrap; }
+  `;
+  container.appendChild(styleBlock);
   container.appendChild(clone);
+  // Append container to the document so it is rendered (but not visible to the user)
+  container.style.position = 'absolute';
+  container.style.left = '-5000px';
   document.body.appendChild(container);
-  
-  // Force reflow and allow layout to settle
-  await new Promise(resolve => setTimeout(resolve, 100));
-  
+  // Wait for layout / reflow.
+  await new Promise(resolve => setTimeout(resolve, 300));
   try {
     await html2pdf().set({
       margin: 0.5,
@@ -110,12 +120,15 @@ const generatePDF = async () => {
         windowWidth: 1100,
         scrollY: 0
       },
-      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' },
+      pagebreak: { mode: 'avoid-all' }
     }).from(container).save();
   } finally {
     container.remove();
   }
 };
+
+// ------ END NEW PRINT-TO-PDF LOGIC ------
 
 const themes = ['theme-light', 'theme-dark', 'theme-black'];
 const themeButtons = document.querySelectorAll('.theme-opt');
