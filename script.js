@@ -106,33 +106,50 @@ const generatePDF = async () => {
     preview: preview.style.cssText,
   }
 
-  // Temporarily apply desktop styles
-  const tempStyles = {
-    container: {
-      maxWidth: '98%',
-      height: 'calc(100vh - 20px)',
-    },
-    editor: {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: '20px',
-      height: 'calc(100vh - 70px)',
-    },
-    preview: {
-      height: 'auto',
-    },
-  }
-
   // Apply temporary desktop styles
-  Object.assign(container.style, tempStyles.container)
-  Object.assign(editor.style, tempStyles.editor)
-  Object.assign(preview.style, tempStyles.preview)
+  Object.assign(container.style, { maxWidth: '98%', height: 'calc(100vh - 20px)' })
+  Object.assign(editor.style, {
+    display: 'grid',
+    gridTemplateColumns: '1fr 1fr',
+    gap: '20px',
+    height: 'calc(100vh - 70px)',
+  })
+  Object.assign(preview.style, { height: 'auto' })
 
   const clonedPreview = preview.cloneNode(true)
   clonedPreview.style.fontSize = '12px'
   clonedPreview.style.lineHeight = '1.5'
   clonedPreview.style.width = '555px'
   clonedPreview.style.overflow = 'hidden'
+
+  // Convert SVG images to canvas elements
+  const svgImages = clonedPreview.getElementsByTagName('img')
+  await Promise.all(Array.from(svgImages).map(async img => {
+    if (img.src.endsWith('.svg') || img.src.includes('data:image/svg+xml')) {
+      try {
+        const canvas = document.createElement('canvas')
+        const ctx = canvas.getContext('2d')
+        const svgImage = new Image()
+        
+        // Handle both URL and base64 SVGs
+        svgImage.src = img.src
+        svgImage.crossOrigin = 'anonymous'
+
+        await new Promise((resolve, reject) => {
+          svgImage.onload = () => {
+            canvas.width = svgImage.width
+            canvas.height = svgImage.height
+            ctx.drawImage(svgImage, 0, 0)
+            img.src = canvas.toDataURL('image/png')
+            resolve()
+          }
+          svgImage.onerror = reject
+        })
+      } catch (err) {
+        console.warn('Failed to convert SVG:', err)
+      }
+    }
+  }))
 
   document.body.appendChild(clonedPreview)
 
@@ -143,6 +160,7 @@ const generatePDF = async () => {
       html2canvas: {
         scale: 0.875,
         useCORS: true,
+        allowTaint: true,
         scrollX: 0,
         scrollY: 0,
       },
