@@ -4,6 +4,9 @@ const preview = $('preview')
 const filename = $('filename')
 const saveBtn = $('saveBtn')
 const printBtn = $('printBtn')
+const container = document.querySelector('.container')
+const editor = document.querySelector('.editor')
+
 
 marked.setOptions({
   breaks: true,
@@ -88,21 +91,52 @@ const saveFile = () => {
 }
 
 const generatePDF = async () => {
-    const { jsPDF } = window.jspdf
-    const pdf = new jsPDF({
-      unit: 'pt',
-      format: 'a4',
-      orientation: 'portrait',
-    })
-  
-    const clonedPreview = preview.cloneNode(true)
-    clonedPreview.style.fontSize = '12px'
-    clonedPreview.style.lineHeight = '1.5'
-    clonedPreview.style.width = '555px'
-    clonedPreview.style.overflow = 'hidden'
-  
-    document.body.appendChild(clonedPreview)
-  
+  const { jsPDF } = window.jspdf
+  const pdf = new jsPDF({
+    unit: 'pt',
+    format: 'a4',
+    orientation: 'portrait',
+  })
+
+  // Store original styles
+  const originalStyles = {
+    container: container.style.cssText,
+    editor: editor.style.cssText,
+    markdown: markdown.style.cssText,
+    preview: preview.style.cssText,
+  }
+
+  // Temporarily apply desktop styles
+  const tempStyles = {
+    container: {
+      maxWidth: '98%',
+      height: 'calc(100vh - 20px)',
+    },
+    editor: {
+      display: 'grid',
+      gridTemplateColumns: '1fr 1fr',
+      gap: '20px',
+      height: 'calc(100vh - 70px)',
+    },
+    preview: {
+      height: 'auto',
+    },
+  }
+
+  // Apply temporary desktop styles
+  Object.assign(container.style, tempStyles.container)
+  Object.assign(editor.style, tempStyles.editor)
+  Object.assign(preview.style, tempStyles.preview)
+
+  const clonedPreview = preview.cloneNode(true)
+  clonedPreview.style.fontSize = '12px'
+  clonedPreview.style.lineHeight = '1.5'
+  clonedPreview.style.width = '555px'
+  clonedPreview.style.overflow = 'hidden'
+
+  document.body.appendChild(clonedPreview)
+
+  try {
     await pdf.html(clonedPreview, {
       x: 20,
       y: 20,
@@ -113,13 +147,19 @@ const generatePDF = async () => {
         scrollY: 0,
       },
       margin: [20, 20, 20, 20],
-      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }, // Ensure page breaks respect CSS
-      callback: () => {
-        pdf.save(filename.value.replace('.md', '.pdf'))
-        clonedPreview.remove()
-      },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
     })
+
+    pdf.save(filename.value.replace('.md', '.pdf'))
+  } finally {
+    // Restore original styles
+    container.style.cssText = originalStyles.container
+    editor.style.cssText = originalStyles.editor
+    markdown.style.cssText = originalStyles.markdown
+    preview.style.cssText = originalStyles.preview
+    clonedPreview.remove()
   }
+}
 
 const themes = ['theme-light', 'theme-dark', 'theme-black']
 const themeButtons = document.querySelectorAll('.theme-opt')
