@@ -291,7 +291,7 @@ body {
   max-width: 100% !important;
   max-height: 100% !important;
   display: block !important;
+  break-inside: avoid-page !important;
+  page-break-inside: avoid !important;
   margin: 0 auto;
-  break-inside: avoid;
-  page-break-inside: avoid;
 }
