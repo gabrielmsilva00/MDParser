@@ -220,23 +220,11 @@ const handleImageDrop = e => {
   })
 }
 
-printBtn.onclick = async () => {
-  const originalText = printBtn.textContent
-  printBtn.textContent = '📄 Converting...'
-  printBtn.disabled = true
-  
-  try {
-    await generatePDF()
-  } finally {
-    printBtn.textContent = originalText
-    printBtn.disabled = false
-  }
-}
-
 markdown.addEventListener('dragover', e => e.preventDefault())
 markdown.addEventListener('drop', handleImageDrop)
 
 saveBtn.onclick = saveFile
+printBtn.onclick = async () => await generatePDF()
 markdown.oninput = updatePreview
 
 markdown.value = initialContent
