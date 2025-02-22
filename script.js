@@ -7,10 +7,14 @@ const printBtn = $('printBtn')
 const container = document.querySelector('.container')
 const editor = document.querySelector('.editor')
 
-
 marked.setOptions({
   breaks: true,
   gfm: true,
+  mangle: false,
+  headerIds: true,
+  smartLists: true,
+  smartypants: true,
+  xhtml: true
 })
 
 const initialContent = `# Example Markdown Document
@@ -216,11 +220,23 @@ const handleImageDrop = e => {
   })
 }
 
+printBtn.onclick = async () => {
+  const originalText = printBtn.textContent
+  printBtn.textContent = '📄 Converting...'
+  printBtn.disabled = true
+  
+  try {
+    await generatePDF()
+  } finally {
+    printBtn.textContent = originalText
+    printBtn.disabled = false
+  }
+}
+
 markdown.addEventListener('dragover', e => e.preventDefault())
 markdown.addEventListener('drop', handleImageDrop)
 
 saveBtn.onclick = saveFile
-printBtn.onclick = generatePDF
 markdown.oninput = updatePreview
 
 markdown.value = initialContent
